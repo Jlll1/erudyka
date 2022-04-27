@@ -14,7 +14,7 @@ getErudykaDbPath(void)
 }
 
 int
-addNewRecord(const char *content)
+addNewCard(const char *content)
 {
     FILE *db;
 
@@ -38,7 +38,7 @@ main(int argc, char const *argv[])
          * 1 parameter arguments
          */
         if (!strcmp(argv[i], "-n")) {   /* Add a new record */
-            return addNewRecord(argv[++i]);
+            return addNewCard(argv[++i]);
         }
     }
 
