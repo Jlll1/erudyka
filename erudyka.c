@@ -37,7 +37,8 @@ int handleSearch(const char *predicate)
     if (db == NULL) return -1;
 
     while (fread(card, 1, 500, db))
-        printf(card);
+        if (strstr(card, predicate))
+            printf(card);
 
     printf("\n");
     return 0;
