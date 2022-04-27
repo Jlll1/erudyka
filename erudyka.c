@@ -14,7 +14,7 @@ getErudykaDbPath(void)
 }
 
 int
-addNewCard(const char *content)
+handleNewCard(const char *content)
 {
     FILE *db;
 
@@ -29,6 +29,23 @@ addNewCard(const char *content)
 }
 
 int
+handleSearch(const char *predicate)
+{
+    FILE *db;
+    char card[500];
+
+    db = fopen(erudykaDbPath, "r");
+    if (db == NULL) return -1;
+
+    while (fread(card, 1, 500, db))
+        if (strstr(card, predicate))
+            printf(card);
+
+    printf("\n");
+    return 0;
+}
+
+int
 main(int argc, char const *argv[])
 {
     erudykaDbPath = getErudykaDbPath();
@@ -38,7 +55,9 @@ main(int argc, char const *argv[])
          * 1 parameter arguments
          */
         if (!strcmp(argv[i], "-n")) {   /* Add a new record */
-            return addNewCard(argv[++i]);
+            return handleNewCard(argv[++i]);
+        } else if (!strcmp(argv[i], "-s")) { /* Search for records matching parameter */
+            return handleSearch(argv[++i]);
         }
     }
 
