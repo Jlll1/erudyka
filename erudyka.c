@@ -45,19 +45,33 @@ handleSearch(const char *predicate)
     return 0;
 }
 
+void
+printUsage()
+{
+    printf("erudyka [new <content>]        Adds a new card to main.edk\n"
+           "        [search <predicate>]   Searches main.edk to find all cards that match the predicate\n");
+}
+
 int
 main(int argc, char const *argv[])
 {
     erudykaDbPath = getErudykaDbPath();
+    if (argc == 1) {
+        printUsage();
+        return 0;
+    }
 
     for (int i = 1; i < argc; i++) {
         /*
          * 1 parameter arguments
          */
-        if (!strcmp(argv[i], "-n")) {   /* Add a new record */
+        if (!strcmp(argv[i], "new")) {   /* Add a new record */
             return handleNewCard(argv[++i]);
-        } else if (!strcmp(argv[i], "-s")) { /* Search for records matching parameter */
+        } else if (!strcmp(argv[i], "search")) { /* Search for records matching parameter */
             return handleSearch(argv[++i]);
+        } else {
+            printUsage();
+            return 0;
         }
     }
 
