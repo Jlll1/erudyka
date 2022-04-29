@@ -67,7 +67,7 @@ void
 string_trimTrailing(char *str)
 {
     int i;
-    for (i = len(str); str[i] == ' ' || str[i] == '\n'; i--);
+    for (i = sizeof(str); str[i] == ' ' || str[i] == '\n'; i--);
     str[i] = '\0';
 }
 
