@@ -52,6 +52,14 @@ printUsage()
            "        [search <predicate>]   Searches main.edk to find all cards that match the predicate\n");
 }
 
+void
+string_trimTrailing(char *str)
+{
+    int i;
+    for (i = len(str); str[i] == ' ' || str[i] == '\n'; i--);
+    str[i] = '\0';
+}
+
 int
 main(int argc, char const *argv[])
 {
