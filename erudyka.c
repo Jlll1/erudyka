@@ -39,20 +39,20 @@ handleNewCard(const char *content)
 int
 handleSearch(const char *predicate)
 {
-    FILE *db;
-    char card[500];
-
-    db = fopen(erudykaDbPath, "r");
+    FILE *db = fopen(erudykaDbPath, "r");
     if (db == NULL) return -1;
 
-    while (fread(card, 1, 500, db)) {
+    int i = 0;
+    char card[500];
+    while (fread(card, 1, 501, db)) {
         if (strstr(card, predicate)) {
             string_trimTrailing(card);
-            printf(card);
+            printf("%d: %s\n\n", i, card);
         }
+
+        i++;
     }
 
-    printf("\n");
     return 0;
 }
 
