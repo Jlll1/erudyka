@@ -66,9 +66,17 @@ printUsage()
 void
 string_trimTrailing(char *str)
 {
-    int i;
-    for (i = sizeof(str); str[i] == ' ' || str[i] == '\n'; i--);
-    str[i] = '\0';
+    int i = 0;
+    int lastNonWhitespaceCharacter = -1;
+
+    while(str[i] != '\0') {
+        if(str[i] != ' ' && str[i] != '\n' && str[i] != '\t')
+            lastNonWhitespaceCharacter = i;
+
+        i++;
+    }
+
+    str[lastNonWhitespaceCharacter + 1] = '\0';
 }
 
 int
