@@ -2,10 +2,18 @@
 #include<stdlib.h>
 #include<string.h>
 
+/* Function Declarations */
+char *  getErudykaDbPath();
+int     handleNewCard(const char *content);
+int     handleSearch(const char *predicate);
+void    printUsage();
+void    string_trimTrailing(char *str);
+
+/* Globals */
 char *erudykaDbPath;
 
 char *
-getErudykaDbPath(void)
+getErudykaDbPath()
 {
     char *result= getenv("HOME");
     strcat(result, "/.erudyka/main.edk");
@@ -31,17 +39,20 @@ handleNewCard(const char *content)
 int
 handleSearch(const char *predicate)
 {
-    FILE *db;
-    char card[500];
-
-    db = fopen(erudykaDbPath, "r");
+    FILE *db = fopen(erudykaDbPath, "r");
     if (db == NULL) return -1;
 
-    while (fread(card, 1, 500, db))
-        if (strstr(card, predicate))
-            printf(card);
+    int i = 0;
+    char card[500];
+    while (fread(card, 1, 501, db)) {
+        if (strstr(card, predicate)) {
+            string_trimTrailing(card);
+            printf("%d: %s\n\n", i, card);
+        }
 
-    printf("\n");
+        i++;
+    }
+
     return 0;
 }
 
@@ -50,6 +61,22 @@ printUsage()
 {
     printf("erudyka [new <content>]        Adds a new card to main.edk\n"
            "        [search <predicate>]   Searches main.edk to find all cards that match the predicate\n");
+}
+
+void
+string_trimTrailing(char *str)
+{
+    int i = 0;
+    int lastNonWhitespaceCharacter = -1;
+
+    while(str[i] != '\0') {
+        if(str[i] != ' ' && str[i] != '\n' && str[i] != '\t')
+            lastNonWhitespaceCharacter = i;
+
+        i++;
+    }
+
+    str[lastNonWhitespaceCharacter + 1] = '\0';
 }
 
 int
