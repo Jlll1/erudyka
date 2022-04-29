@@ -2,10 +2,18 @@
 #include<stdlib.h>
 #include<string.h>
 
+/* Function Declarations */
+char *  getErudykaDbPath();
+int     handleNewCard(const char *content);
+int     handleSearch(const char *predicate);
+void    printUsage();
+void    string_trimTrailing(char *str);
+
+/* Globals */
 char *erudykaDbPath;
 
 char *
-getErudykaDbPath(void)
+getErudykaDbPath()
 {
     char *result= getenv("HOME");
     strcat(result, "/.erudyka/main.edk");
@@ -37,9 +45,12 @@ handleSearch(const char *predicate)
     db = fopen(erudykaDbPath, "r");
     if (db == NULL) return -1;
 
-    while (fread(card, 1, 500, db))
-        if (strstr(card, predicate))
+    while (fread(card, 1, 500, db)) {
+        if (strstr(card, predicate)) {
+            string_trimTrailing(card);
             printf(card);
+        }
+    }
 
     printf("\n");
     return 0;
