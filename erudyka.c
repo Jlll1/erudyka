@@ -44,7 +44,7 @@ handleSearch(const char *predicate)
 
     int i = 0;
     char card[500];
-    while (fread(card, 1, 501, db)) {
+    while (fread(card, 501, 1, db)) {
         if (strstr(card, predicate)) {
             string_trimTrailing(card);
             printf("%d: %s\n\n", i, card);
@@ -90,11 +90,13 @@ main(int argc, char const *argv[])
 
     for (int i = 1; i < argc; i++) {
         /*
-         * 1 parameter arguments
+         * 1 parameter commands
          */
-        if (!strcmp(argv[i], "new")) {   /* Add a new record */
+        if (!strcmp(argv[i], "get")) {           /* Retrieve a card by id */
+            return handleGet(atoi(argv[++i]));
+        } else if(!strcmp(argv[i], "new")) {     /* Add a new card */
             return handleNewCard(argv[++i]);
-        } else if (!strcmp(argv[i], "search")) { /* Search for records matching parameter */
+        } else if (!strcmp(argv[i], "search")) { /* Search for cards that match the parameter */
             return handleSearch(argv[++i]);
         } else {
             printUsage();
