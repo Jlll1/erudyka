@@ -4,6 +4,7 @@
 
 /* Function Declarations */
 char *  getErudykaDbPath();
+int     handleGet(int id);
 int     handleNewCard(const char *content);
 int     handleSearch(const char *predicate);
 void    printUsage();
@@ -22,13 +23,17 @@ getErudykaDbPath()
 }
 
 int
+handleGet(int id)
+{
+
+}
+
+int
 handleNewCard(const char *content)
 {
-    FILE *db;
-
     if (strlen(content) > 500 - 2) return -1;
 
-    db = fopen(erudykaDbPath, "a");
+    FILE *db = fopen(erudykaDbPath, "a");
     if (db == NULL) return -1;
 
     fprintf(db, "%-500s\n", content);
@@ -42,7 +47,7 @@ handleSearch(const char *predicate)
     FILE *db = fopen(erudykaDbPath, "r");
     if (db == NULL) return -1;
 
-    int i = 0;
+    int i = 1;
     char card[500];
     while (fread(card, 501, 1, db)) {
         if (strstr(card, predicate)) {
