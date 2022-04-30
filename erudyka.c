@@ -4,6 +4,7 @@
 
 /* Function Declarations */
 char *  getErudykaDbPath();
+int     handleGet(int id);
 int     handleNewCard(const char *content);
 int     handleSearch(const char *predicate);
 void    printUsage();
@@ -22,13 +23,28 @@ getErudykaDbPath()
 }
 
 int
+handleGet(int id)
+{
+    if (id < 1) return -1;
+
+    FILE *db = fopen(erudykaDbPath, "r");
+    if (db == NULL) return -1;
+
+    char card[500];
+    fseek(db, 501 * (id - 1), SEEK_SET);
+    fgets(card, 500, db);
+
+    string_trimTrailing(card);
+    printf("%s\n", card);
+    return 0;
+}
+
+int
 handleNewCard(const char *content)
 {
-    FILE *db;
-
     if (strlen(content) > 500 - 2) return -1;
 
-    db = fopen(erudykaDbPath, "a");
+    FILE *db = fopen(erudykaDbPath, "a");
     if (db == NULL) return -1;
 
     fprintf(db, "%-500s\n", content);
@@ -42,9 +58,9 @@ handleSearch(const char *predicate)
     FILE *db = fopen(erudykaDbPath, "r");
     if (db == NULL) return -1;
 
-    int i = 0;
+    int i = 1;
     char card[500];
-    while (fread(card, 1, 501, db)) {
+    while (fread(card, 501, 1, db)) {
         if (strstr(card, predicate)) {
             string_trimTrailing(card);
             printf("%d: %s\n\n", i, card);
@@ -90,11 +106,13 @@ main(int argc, char const *argv[])
 
     for (int i = 1; i < argc; i++) {
         /*
-         * 1 parameter arguments
+         * 1 parameter commands
          */
-        if (!strcmp(argv[i], "new")) {   /* Add a new record */
+        if (!strcmp(argv[i], "get")) {           /* Retrieve a card by id */
+            return handleGet(atoi(argv[++i]));
+        } else if(!strcmp(argv[i], "new")) {     /* Add a new card */
             return handleNewCard(argv[++i]);
-        } else if (!strcmp(argv[i], "search")) { /* Search for records matching parameter */
+        } else if (!strcmp(argv[i], "search")) { /* Search for cards that match the parameter */
             return handleSearch(argv[++i]);
         } else {
             printUsage();
