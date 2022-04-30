@@ -25,7 +25,18 @@ getErudykaDbPath()
 int
 handleGet(int id)
 {
+    if (id < 1) return -1;
 
+    FILE *db = fopen(erudykaDbPath, "r");
+    if (db == NULL) return -1;
+
+    char card[500];
+    fseek(db, 501 * (id - 1), SEEK_SET);
+    fgets(card, 500, db);
+
+    string_trimTrailing(card);
+    printf("%s\n", card);
+    return 0;
 }
 
 int
