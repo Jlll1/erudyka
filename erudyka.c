@@ -63,7 +63,7 @@ handleSearch(const char *predicate)
     int i = 1;
     char card[500];
     while (fread(card, 501, 1, db)) {
-        if (strstr(card, predicate)) {
+        if (string_contains_invariant(card, predicate)) {
             string_trimTrailing(card);
             printf("%d: %s\n\n", i, card);
         }
