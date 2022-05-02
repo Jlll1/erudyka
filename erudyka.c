@@ -1,3 +1,4 @@
+#include<ctype.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -8,6 +9,7 @@ int     handleGet(int id);
 int     handleNewCard(const char *content);
 int     handleSearch(const char *predicate);
 void    printUsage();
+int     string_contains_invariant(char *str1, char *str2);
 void    string_trimTrailing(char *str);
 
 /* Globals */
@@ -77,6 +79,20 @@ printUsage()
 {
     printf("erudyka [new <content>]        Adds a new card to main.edk\n"
            "        [search <predicate>]   Searches main.edk to find all cards that match the predicate\n");
+}
+
+int
+string_contains_invariant(char *str1, char *str2)
+{
+    for(; *str1 != '\0'; str1++) {
+        for(int i = 0;; i++) {
+            if(str2[i] == '\0') return 1;
+            if(tolower((unsigned char)str1[i]) != tolower((unsigned char)str2[i]))
+                break;
+        }
+    }
+
+    return 0;
 }
 
 void
