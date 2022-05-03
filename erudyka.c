@@ -6,6 +6,7 @@
 /* Function Declarations */
 char *  getErudykaDbPath();
 int     handleGet(int id);
+int     handleLink(int id1, int id2);
 int     handleNewCard(const char *content);
 int     handleSearch(const char *predicate);
 void    printUsage();
@@ -39,6 +40,11 @@ handleGet(int id)
     string_trimTrailing(card);
     printf("%s\n", card);
     return 0;
+}
+
+int
+handleLink(int id1, int id2)
+{
 }
 
 int
@@ -124,12 +130,18 @@ main(int argc, char const *argv[])
         /*
          * 1 parameter commands
          */
-        if (!strcmp(argv[i], "get")) {           /* Retrieve a card by id */
+        if(!strcmp(argv[i], "get")) {           /* Retrieve a card by id */
             return handleGet(atoi(argv[++i]));
-        } else if(!strcmp(argv[i], "new")) {     /* Add a new card */
+        } else if(!strcmp(argv[i], "new")) {    /* Add a new card */
             return handleNewCard(argv[++i]);
-        } else if (!strcmp(argv[i], "search")) { /* Search for cards that match the parameter */
+        } else if(!strcmp(argv[i], "search")) { /* Search for cards that match the parameter */
             return handleSearch(argv[++i]);
+        }
+        /*
+         * 2 parameter commands
+         */
+          else if(!strcmp(argv[i], "link")) {   /* Link card1 to card2 */
+              return handleLink(atoi(argv[++i]), atoi(argv[++i]));
         } else {
             printUsage();
             return 0;
