@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include<ctype.h>
 #include<stdio.h>
 #include<stdlib.h>
@@ -14,13 +15,14 @@ int     string_contains_invariant(const char *str1, const char *str2);
 void    string_trimTrailing(char *str);
 
 /* Globals */
-char *erudykaDbPath;
+char *erudykaMainDbPath;
+char *erudykaLinksDbPath;
 
 char *
-getErudykaDbPath()
+getErudykaDbPath(char *dbName)
 {
-    char *result= getenv("HOME");
-    strcat(result, "/.erudyka/main.edk");
+    char *result;
+    asprintf(&result, "%s/.erudyka/%s.edk", getenv("HOME"), dbName);
 
     return result;
 }
@@ -30,7 +32,7 @@ handleGet(int id)
 {
     if (id < 1) return -1;
 
-    FILE *db = fopen(erudykaDbPath, "r");
+    FILE *db = fopen(erudykaMainDbPath, "r");
     if (db == NULL) return -1;
 
     char card[500];
@@ -52,7 +54,7 @@ handleNewCard(const char *content)
 {
     if (strlen(content) > 500 - 2) return -1;
 
-    FILE *db = fopen(erudykaDbPath, "a");
+    FILE *db = fopen(erudykaMainDbPath, "a");
     if (db == NULL) return -1;
 
     fprintf(db, "%-500s\n", content);
@@ -63,7 +65,7 @@ handleNewCard(const char *content)
 int
 handleSearch(const char *predicate)
 {
-    FILE *db = fopen(erudykaDbPath, "r");
+    FILE *db = fopen(erudykaMainDbPath, "r");
     if (db == NULL) return -1;
 
     int i = 1;
@@ -120,7 +122,8 @@ string_trimTrailing(char *str)
 int
 main(int argc, char const *argv[])
 {
-    erudykaDbPath = getErudykaDbPath();
+    erudykaMainDbPath = getErudykaDbPath("main");
+    erudykaLinksDbPath = getErudykaDbPath("links");
     if (argc == 1) {
         printUsage();
         return 0;
