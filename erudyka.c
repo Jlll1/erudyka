@@ -47,6 +47,14 @@ handleGet(int id)
 int
 handleLink(int id1, int id2)
 {
+    if (id1 < 1 || id2 < 1) return -1;
+
+    FILE *links = fopen(erudykaLinksDbPath, "a");
+    if (links == NULL) return -1;
+
+    fprintf(links, "%d-%d\n", id1, id2);
+
+    return 0;
 }
 
 int
