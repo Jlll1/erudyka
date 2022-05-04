@@ -10,6 +10,7 @@ int     handleGet(int id);
 int     handleLink(int id1, int id2);
 int     handleNewCard(const char *content);
 int     handleSearch(const char *predicate);
+int     printCard(int id);
 void    printUsage();
 int     string_contains_invariant(const char *str1, const char *str2);
 void    string_trimTrailing(char *str);
@@ -32,15 +33,26 @@ handleGet(int id)
 {
     if (id < 1) return -1;
 
-    FILE *db = fopen(erudykaMainDbPath, "r");
-    if (db == NULL) return -1;
+    FILE *links = fopen(erudykaLinksDbPath, "r");
+    if (links == NULL) return -1;
 
-    char card[500];
-    fseek(db, 501 * (id - 1), SEEK_SET);
-    fgets(card, 500, db);
+    printCard(id);
 
-    string_trimTrailing(card);
-    printf("%s\n", card);
+    char link[30];
+    while (fgets(link, 30, links)) {
+        int result;
+        int id1 = atoi(strtok(link, "-"));
+        int id2 = atoi(strtok(NULL, "-"));
+        if (id == id1) {
+            result = printCard(id2);
+        }
+
+        if (result != 0) {
+            return result;
+        }
+    }
+
+    fclose(links);
     return 0;
 }
 
@@ -52,7 +64,7 @@ handleLink(int id1, int id2)
     FILE *links = fopen(erudykaLinksDbPath, "a");
     if (links == NULL) return -1;
 
-    fprintf(links, "%d-%d\n", id1, id2);
+    fprintf(links, "%d-%d\n", id2, id1);
 
     return 0;
 }
@@ -87,6 +99,23 @@ handleSearch(const char *predicate)
         i++;
     }
 
+    return 0;
+}
+
+int
+printCard(int id)
+{
+    FILE *main = fopen(erudykaMainDbPath, "r");
+    if (main == NULL) return -1;
+
+    char card[500];
+    fseek(main, 501 * (id - 1), SEEK_SET);
+    fgets(card, 500, main);
+
+    string_trimTrailing(card);
+    printf("%s\n", card);
+
+    fclose(main);
     return 0;
 }
 
