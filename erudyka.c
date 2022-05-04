@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include<ctype.h>
 #include<stdio.h>
 #include<stdlib.h>
@@ -6,6 +7,7 @@
 /* Function Declarations */
 char *  getErudykaDbPath();
 int     handleGet(int id);
+int     handleLink(int id1, int id2);
 int     handleNewCard(const char *content);
 int     handleSearch(const char *predicate);
 void    printUsage();
@@ -13,13 +15,14 @@ int     string_contains_invariant(const char *str1, const char *str2);
 void    string_trimTrailing(char *str);
 
 /* Globals */
-char *erudykaDbPath;
+char *erudykaMainDbPath;
+char *erudykaLinksDbPath;
 
 char *
-getErudykaDbPath()
+getErudykaDbPath(char *dbName)
 {
-    char *result= getenv("HOME");
-    strcat(result, "/.erudyka/main.edk");
+    char *result;
+    asprintf(&result, "%s/.erudyka/%s.edk", getenv("HOME"), dbName);
 
     return result;
 }
@@ -29,7 +32,7 @@ handleGet(int id)
 {
     if (id < 1) return -1;
 
-    FILE *db = fopen(erudykaDbPath, "r");
+    FILE *db = fopen(erudykaMainDbPath, "r");
     if (db == NULL) return -1;
 
     char card[500];
@@ -42,11 +45,24 @@ handleGet(int id)
 }
 
 int
+handleLink(int id1, int id2)
+{
+    if (id1 < 1 || id2 < 1) return -1;
+
+    FILE *links = fopen(erudykaLinksDbPath, "a");
+    if (links == NULL) return -1;
+
+    fprintf(links, "%d-%d\n", id1, id2);
+
+    return 0;
+}
+
+int
 handleNewCard(const char *content)
 {
     if (strlen(content) > 500 - 2) return -1;
 
-    FILE *db = fopen(erudykaDbPath, "a");
+    FILE *db = fopen(erudykaMainDbPath, "a");
     if (db == NULL) return -1;
 
     fprintf(db, "%-500s\n", content);
@@ -57,7 +73,7 @@ handleNewCard(const char *content)
 int
 handleSearch(const char *predicate)
 {
-    FILE *db = fopen(erudykaDbPath, "r");
+    FILE *db = fopen(erudykaMainDbPath, "r");
     if (db == NULL) return -1;
 
     int i = 1;
@@ -114,7 +130,8 @@ string_trimTrailing(char *str)
 int
 main(int argc, char const *argv[])
 {
-    erudykaDbPath = getErudykaDbPath();
+    erudykaMainDbPath = getErudykaDbPath("main");
+    erudykaLinksDbPath = getErudykaDbPath("links");
     if (argc == 1) {
         printUsage();
         return 0;
@@ -124,12 +141,18 @@ main(int argc, char const *argv[])
         /*
          * 1 parameter commands
          */
-        if (!strcmp(argv[i], "get")) {           /* Retrieve a card by id */
+        if(!strcmp(argv[i], "get")) {           /* Retrieve a card by id */
             return handleGet(atoi(argv[++i]));
-        } else if(!strcmp(argv[i], "new")) {     /* Add a new card */
+        } else if(!strcmp(argv[i], "new")) {    /* Add a new card */
             return handleNewCard(argv[++i]);
-        } else if (!strcmp(argv[i], "search")) { /* Search for cards that match the parameter */
+        } else if(!strcmp(argv[i], "search")) { /* Search for cards that match the parameter */
             return handleSearch(argv[++i]);
+        }
+        /*
+         * 2 parameter commands
+         */
+          else if(!strcmp(argv[i], "link")) {   /* Link card1 to card2 */
+              return handleLink(atoi(argv[++i]), atoi(argv[++i]));
         } else {
             printUsage();
             return 0;
