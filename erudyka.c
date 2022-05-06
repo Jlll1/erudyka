@@ -122,8 +122,10 @@ printCard(int id)
 void
 printUsage()
 {
-    printf("erudyka [new <content>]        Adds a new card to main.edk\n"
-           "        [search <predicate>]   Searches main.edk to find all cards that match the predicate\n");
+    printf("erudyka [get <id>]              Finds a card with specified id and prints it and all cards linked to it\n"
+           "        [new <content>]         Adds a new card\n"
+           "        [search <predicate>]    Prints all cards that match the predicate\n"
+           "        [link <id1> <id2>]      Links two cards with specified ids together\n");
 }
 
 int
