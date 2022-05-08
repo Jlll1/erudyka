@@ -78,7 +78,21 @@ handleNewCard(const char *content)
 int
 handleSave(const char *command, const char *content)
 {
+    char *scriptPath;
+    asprintf(
+        &scriptPath,
+        "./%s/%s.sh %s",
+        joinErudykaPath("scripts"), command, content);
 
+    FILE *pipe = popen(scriptPath, "r");
+    if (pipe == NULL) return -1;
+
+    char card[498];
+    fread(card, 498, 1, pipe);
+    if (pclose(pipe)) return -1;
+
+    handleNewCard(card);
+    return 0;
 }
 
 int
