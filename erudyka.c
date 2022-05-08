@@ -9,7 +9,7 @@ char *  joinErudykaPath();
 int     handleGet(int id);
 int     handleLink(int id1, int id2);
 int     handleNewCard(const char *content);
-int     handleSave(const char *command, const char *content);
+int     handleSave(const char *content, const char *command);
 int     handleSearch(const char *predicate);
 int     printCard(int id);
 void    printUsage();
@@ -76,12 +76,12 @@ handleNewCard(const char *content)
 }
 
 int
-handleSave(const char *command, const char *content)
+handleSave(const char *content, const char *command)
 {
     char *scriptPath;
     asprintf(
         &scriptPath,
-        "./%s/%s.sh %s",
+        "sh %s/%s.sh %s",
         joinErudykaPath("scripts"), command, content);
 
     FILE *pipe = popen(scriptPath, "r");
