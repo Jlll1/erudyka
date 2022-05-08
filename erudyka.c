@@ -5,10 +5,11 @@
 #include<string.h>
 
 /* Function Declarations */
-char *  getErudykaDbPath();
+char *  joinErudykaPath();
 int     handleGet(int id);
 int     handleLink(int id1, int id2);
 int     handleNewCard(const char *content);
+int     handleSave(const char *content, const char *command);
 int     handleSearch(const char *predicate);
 int     printCard(int id);
 void    printUsage();
@@ -18,15 +19,6 @@ void    string_trimTrailing(char *str);
 /* Globals */
 char *erudykaMainDbPath;
 char *erudykaLinksDbPath;
-
-char *
-getErudykaDbPath(char *dbName)
-{
-    char *result;
-    asprintf(&result, "%s/.erudyka/%s.edk", getenv("HOME"), dbName);
-
-    return result;
-}
 
 int
 handleGet(int id)
@@ -74,11 +66,32 @@ handleNewCard(const char *content)
 {
     if (strlen(content) > 500 - 2) return -1;
 
-    FILE *db = fopen(erudykaMainDbPath, "a");
-    if (db == NULL) return -1;
+    FILE *main= fopen(erudykaMainDbPath, "a");
+    if (main == NULL) return -1;
 
-    fprintf(db, "%-500s\n", content);
+    fprintf(main, "%-500s\n", content);
 
+    fclose(main);
+    return 0;
+}
+
+int
+handleSave(const char *content, const char *command)
+{
+    char *scriptPath;
+    asprintf(
+        &scriptPath,
+        "sh %s/%s.sh %s",
+        joinErudykaPath("scripts"), command, content);
+
+    FILE *pipe = popen(scriptPath, "r");
+    if (pipe == NULL) return -1;
+
+    char card[498];
+    fread(card, 498, 1, pipe);
+    if (pclose(pipe)) return -1;
+
+    handleNewCard(card);
     return 0;
 }
 
@@ -102,6 +115,15 @@ handleSearch(const char *predicate)
     return 0;
 }
 
+char *
+joinErudykaPath(char *path)
+{
+    char *result;
+    asprintf(&result, "%s/.erudyka/%s", getenv("HOME"), path);
+
+    return result;
+}
+
 int
 printCard(int id)
 {
@@ -122,10 +144,11 @@ printCard(int id)
 void
 printUsage()
 {
-    printf("erudyka [get <id>]              Finds a card with specified id and prints it and all cards linked to it\n"
-           "        [new <content>]         Adds a new card\n"
-           "        [search <predicate>]    Prints all cards that match the predicate\n"
-           "        [link <id1> <id2>]      Links two cards with specified ids together\n");
+    printf("erudyka [get <id>]                  Finds a card with specified id and prints it and all cards linked to it\n"
+           "        [link <id1> <id2>]          Links two cards with specified ids together\n"
+           "        [new <content>]             Adds a new card\n"
+           "        [save <command> <content>]  Pipes <content> into sh <command> and uses result to create new card\n"
+           "        [search <predicate>]        Prints all cards that match the predicate\n");
 }
 
 int
@@ -161,8 +184,8 @@ string_trimTrailing(char *str)
 int
 main(int argc, char const *argv[])
 {
-    erudykaMainDbPath = getErudykaDbPath("main");
-    erudykaLinksDbPath = getErudykaDbPath("links");
+    erudykaMainDbPath = joinErudykaPath("main.edk");
+    erudykaLinksDbPath = joinErudykaPath("links.edk");
     if (argc == 1) {
         printUsage();
         return 0;
@@ -183,7 +206,9 @@ main(int argc, char const *argv[])
          * 2 parameter commands
          */
           else if(!strcmp(argv[i], "link")) {   /* Link card1 to card2 */
-              return handleLink(atoi(argv[++i]), atoi(argv[++i]));
+            return handleLink(atoi(argv[++i]), atoi(argv[++i]));
+        } else if(!strcmp(argv[i], "save")) {
+            return handleSave(argv[++i], argv[++i]);
         } else {
             printUsage();
             return 0;
