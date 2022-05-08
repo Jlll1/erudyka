@@ -5,7 +5,7 @@
 #include<string.h>
 
 /* Function Declarations */
-char *  getErudykaDbPath();
+char *  joinErudykaPath();
 int     handleGet(int id);
 int     handleLink(int id1, int id2);
 int     handleNewCard(const char *content);
@@ -19,15 +19,6 @@ void    string_trimTrailing(char *str);
 /* Globals */
 char *erudykaMainDbPath;
 char *erudykaLinksDbPath;
-
-char *
-getErudykaDbPath(char *dbName)
-{
-    char *result;
-    asprintf(&result, "%s/.erudyka/%s.edk", getenv("HOME"), dbName);
-
-    return result;
-}
 
 int
 handleGet(int id)
@@ -110,6 +101,15 @@ handleSearch(const char *predicate)
     return 0;
 }
 
+char *
+joinErudykaPath(char *path)
+{
+    char *result;
+    asprintf(&result, "%s/.erudyka/%s", getenv("HOME"), path);
+
+    return result;
+}
+
 int
 printCard(int id)
 {
@@ -169,8 +169,8 @@ string_trimTrailing(char *str)
 int
 main(int argc, char const *argv[])
 {
-    erudykaMainDbPath = getErudykaDbPath("main");
-    erudykaLinksDbPath = getErudykaDbPath("links");
+    erudykaMainDbPath = joinErudykaPath("main.edk");
+    erudykaLinksDbPath = joinErudykaPath("links.edk");
     if (argc == 1) {
         printUsage();
         return 0;
