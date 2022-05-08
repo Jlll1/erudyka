@@ -9,6 +9,7 @@ char *  getErudykaDbPath();
 int     handleGet(int id);
 int     handleLink(int id1, int id2);
 int     handleNewCard(const char *content);
+int     handleSave(const char *command, const char *content);
 int     handleSearch(const char *predicate);
 int     printCard(int id);
 void    printUsage();
@@ -80,6 +81,12 @@ handleNewCard(const char *content)
     fprintf(db, "%-500s\n", content);
 
     return 0;
+}
+
+int
+handleSave(const char *command, const char *content)
+{
+
 }
 
 int
@@ -183,7 +190,9 @@ main(int argc, char const *argv[])
          * 2 parameter commands
          */
           else if(!strcmp(argv[i], "link")) {   /* Link card1 to card2 */
-              return handleLink(atoi(argv[++i]), atoi(argv[++i]));
+            return handleLink(atoi(argv[++i]), atoi(argv[++i]));
+        } else if(!strcmp(argv[i], "save")) {
+            return handleSave(argv[++i], argv[++i]);
         } else {
             printUsage();
             return 0;
