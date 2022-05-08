@@ -75,11 +75,12 @@ handleNewCard(const char *content)
 {
     if (strlen(content) > 500 - 2) return -1;
 
-    FILE *db = fopen(erudykaMainDbPath, "a");
-    if (db == NULL) return -1;
+    FILE *main= fopen(erudykaMainDbPath, "a");
+    if (main == NULL) return -1;
 
-    fprintf(db, "%-500s\n", content);
+    fprintf(main, "%-500s\n", content);
 
+    fclose(main);
     return 0;
 }
 
