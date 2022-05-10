@@ -144,11 +144,11 @@ printCard(int id)
 void
 printUsage()
 {
-    printf("erudyka [get <id>]                  Finds a card with specified id and prints it and all cards linked to it\n"
-           "        [link <id1> <id2>]          Links two cards with specified ids together\n"
-           "        [new <content>]             Adds a new card\n"
-           "        [save <command> <content>]  Pipes <content> into sh <command> and uses result to create new card\n"
-           "        [search <predicate>]        Prints all cards that match the predicate\n");
+    puts("erudyka [get <id>]                  Finds a card with specified id and prints it and all cards linked to it\n"
+         "        [link <id1> <id2>]          Links two cards with specified ids together\n"
+         "        [new <content>]             Adds a new card\n"
+         "        [save <command> <content>]  Pipes <content> into sh <command> and uses result to create new card\n"
+         "        [search <predicate>]        Prints all cards that match the predicate\n");
 }
 
 int
@@ -186,34 +186,33 @@ main(int argc, char const *argv[])
 {
     erudykaMainDbPath = joinErudykaPath("main.edk");
     erudykaLinksDbPath = joinErudykaPath("links.edk");
-    if (argc == 1) {
+
+    /* 1 parameter commands */
+    if (argc < 3) {
         printUsage();
         return 0;
     }
 
-    for (int i = 1; i < argc; i++) {
-        /*
-         * 1 parameter commands
-         */
-        if(!strcmp(argv[i], "get")) {           /* Retrieve a card by id */
-            return handleGet(atoi(argv[++i]));
-        } else if(!strcmp(argv[i], "new")) {    /* Add a new card */
-            return handleNewCard(argv[++i]);
-        } else if(!strcmp(argv[i], "search")) { /* Search for cards that match the parameter */
-            return handleSearch(argv[++i]);
-        }
-        /*
-         * 2 parameter commands
-         */
-          else if(!strcmp(argv[i], "link")) {   /* Link card1 to card2 */
-            return handleLink(atoi(argv[++i]), atoi(argv[++i]));
-        } else if(!strcmp(argv[i], "save")) {
-            return handleSave(argv[++i], argv[++i]);
-        } else {
-            printUsage();
-            return 0;
-        }
+    if (!strcmp(argv[1], "get")) {           /* Retrieve a card by id */
+        return handleGet(atoi(argv[2]));
+    } else if (!strcmp(argv[1], "new")) {    /* Add a new card */
+        return handleNewCard(argv[2]);
+    } else if (!strcmp(argv[1], "search")) { /* Search for cards that match the parameter */
+        return handleSearch(argv[2]);
     }
 
+    /* 2 parameter commands */
+    if (argc < 4) {
+        printUsage();
+        return 0;
+    }
+
+    if(!strcmp(argv[1], "link")) {          /* Link card1 to card2 */
+        return handleLink(atoi(argv[2]), atoi(argv[3]));
+    } else if(!strcmp(argv[1], "save")) {   /* Pass input to the specified script and save output as card */
+        return handleSave(argv[2], argv[3]);
+    }
+
+    printUsage();
     return 0;
 }
