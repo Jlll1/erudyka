@@ -160,13 +160,15 @@ handleSearch(const char *predicate)
 }
 
 void
-printUsage()
+printUsageAndExit()
 {
     puts("erudyka [get <id>]                  Finds a card with specified id and prints it and all cards linked to it\n"
          "        [link <id1> <id2>]          Links two cards with specified ids together\n"
          "        [new <content>]             Adds a new card\n"
          "        [save <command> <content>]  Pipes <content> into sh <command> and uses result to create new card\n"
          "        [search <predicate>]        Prints all cards that match the predicate\n");
+
+    return 0;
 }
 
 int
@@ -176,10 +178,7 @@ main(int argc, char const *argv[])
     erudykaLinksDbPath = joinErudykaPath("links.edk");
 
     /* 1 parameter commands */
-    if (argc < 3) {
-        printUsage();
-        return 0;
-    }
+    if (argc < 3) printUsageAndExit();
 
     if (!strcmp(argv[1], "get")) {           /* Retrieve a card by id */
         return handleGet(atoi(argv[2]));
@@ -190,10 +189,7 @@ main(int argc, char const *argv[])
     }
 
     /* 2 parameter commands */
-    if (argc < 4) {
-        printUsage();
-        return 0;
-    }
+    if (argc < 4) printUsageAndExit();
 
     if (!strcmp(argv[1], "link")) {          /* Link card1 to card2 */
         return handleLink(atoi(argv[2]), atoi(argv[3]));
@@ -201,6 +197,5 @@ main(int argc, char const *argv[])
         return handleSave(argv[2], argv[3]);
     }
 
-    printUsage();
-    return 0;
+    printUsageAndExit();
 }
