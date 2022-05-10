@@ -4,21 +4,65 @@
 #include<stdlib.h>
 #include<string.h>
 
-/* Function Declarations */
-char *  joinErudykaPath();
-int     handleGet(int id);
-int     handleLink(int id1, int id2);
-int     handleNewCard(const char *content);
-int     handleSave(const char *content, const char *command);
-int     handleSearch(const char *predicate);
-int     printCard(int id);
-void    printUsage();
-int     string_contains_invariant(const char *str1, const char *str2);
-void    string_trimTrailing(char *str);
-
 /* Globals */
 char *erudykaMainDbPath;
 char *erudykaLinksDbPath;
+
+int
+string_contains_invariant(const char *str1, const char *str2)
+{
+    for(; *str1 != '\0'; str1++) {
+        for(int i = 0;; i++) {
+            if(str2[i] == '\0') return 1;
+            if(tolower((unsigned char)str1[i]) != tolower((unsigned char)str2[i]))
+                break;
+        }
+    }
+
+    return 0;
+}
+
+void
+string_trimTrailing(char *str)
+{
+    int i = 0;
+    int lastNonWhitespaceCharacter = -1;
+
+    while(str[i] != '\0') {
+        if(str[i] != ' ' && str[i] != '\n' && str[i] != '\t')
+            lastNonWhitespaceCharacter = i;
+
+        i++;
+    }
+
+    str[lastNonWhitespaceCharacter + 1] = '\0';
+}
+
+char *
+joinErudykaPath(char *path)
+{
+    char *result;
+    asprintf(&result, "%s/.erudyka/%s", getenv("HOME"), path);
+
+    return result;
+}
+
+int
+printCard(int id)
+{
+    FILE *main = fopen(erudykaMainDbPath, "r");
+    if (main == NULL) return -1;
+
+    char card[500];
+    fseek(main, 501 * (id - 1), SEEK_SET);
+    fgets(card, 500, main);
+
+    string_trimTrailing(card);
+    printf("%s\n", card);
+
+    fclose(main);
+    return 0;
+}
 
 int
 handleGet(int id)
@@ -115,32 +159,6 @@ handleSearch(const char *predicate)
     return 0;
 }
 
-char *
-joinErudykaPath(char *path)
-{
-    char *result;
-    asprintf(&result, "%s/.erudyka/%s", getenv("HOME"), path);
-
-    return result;
-}
-
-int
-printCard(int id)
-{
-    FILE *main = fopen(erudykaMainDbPath, "r");
-    if (main == NULL) return -1;
-
-    char card[500];
-    fseek(main, 501 * (id - 1), SEEK_SET);
-    fgets(card, 500, main);
-
-    string_trimTrailing(card);
-    printf("%s\n", card);
-
-    fclose(main);
-    return 0;
-}
-
 void
 printUsage()
 {
@@ -149,36 +167,6 @@ printUsage()
          "        [new <content>]             Adds a new card\n"
          "        [save <command> <content>]  Pipes <content> into sh <command> and uses result to create new card\n"
          "        [search <predicate>]        Prints all cards that match the predicate\n");
-}
-
-int
-string_contains_invariant(const char *str1, const char *str2)
-{
-    for(; *str1 != '\0'; str1++) {
-        for(int i = 0;; i++) {
-            if(str2[i] == '\0') return 1;
-            if(tolower((unsigned char)str1[i]) != tolower((unsigned char)str2[i]))
-                break;
-        }
-    }
-
-    return 0;
-}
-
-void
-string_trimTrailing(char *str)
-{
-    int i = 0;
-    int lastNonWhitespaceCharacter = -1;
-
-    while(str[i] != '\0') {
-        if(str[i] != ' ' && str[i] != '\n' && str[i] != '\t')
-            lastNonWhitespaceCharacter = i;
-
-        i++;
-    }
-
-    str[lastNonWhitespaceCharacter + 1] = '\0';
 }
 
 int
@@ -207,9 +195,9 @@ main(int argc, char const *argv[])
         return 0;
     }
 
-    if(!strcmp(argv[1], "link")) {          /* Link card1 to card2 */
+    if (!strcmp(argv[1], "link")) {          /* Link card1 to card2 */
         return handleLink(atoi(argv[2]), atoi(argv[3]));
-    } else if(!strcmp(argv[1], "save")) {   /* Pass input to the specified script and save output as card */
+    } else if (!strcmp(argv[1], "save")) {   /* Pass input to the specified script and save output as card */
         return handleSave(argv[2], argv[3]);
     }
 
