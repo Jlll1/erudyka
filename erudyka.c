@@ -162,7 +162,9 @@ handleSearch(const char *predicate)
 void
 printUsageAndExit()
 {
-    puts("erudyka [get <id>]                  Finds a card with specified id and prints it and all cards linked to it\n"
+    puts("erudyka <options> [command <args>]\n"
+         "        --dir <directory>           Specifies the erudyka root directory, by default: ~/.erudyka/\n"
+         "        [get <id>]                  Finds a card with specified id and prints it and all cards linked to it\n"
          "        [link <id1> <id2>]          Links two cards with specified ids together\n"
          "        [new <content>]             Adds a new card\n"
          "        [save <command> <content>]  Pipes <content> into sh <command> and uses result to create new card\n"
