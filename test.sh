@@ -1,6 +1,6 @@
 #!/bin/sh
 test() {
-    echo "$1"
+    echo "TEST: $1"
 }
 
 setup() {
@@ -19,7 +19,7 @@ assert_equal() {
     if [ "$actual" = "$expected" ]; then
         echo "PASS"
     else
-        echo "FAIL - Expected '$expected', but got '$actual'"
+        echo "FAIL - Expected '$expcetd', but got '$actual'."
     fi
 
     echo ""
@@ -28,10 +28,9 @@ assert_equal() {
 ##### SETUP ########
 
 setup
+echo ""
 
 ##### TESTS ########
-
-echo ""
 
 test "new <card> -> search <card> returns <card> with id 1"
     card="test card"
@@ -52,3 +51,20 @@ test "new <card> -> get 1 returns <card>"
 
     assert_equal "$expectedCard" "$result"
     teardown
+
+test "get prints linked cards"
+    card1="test card 1"
+    card2="test card 2"
+    expectedCard=$(echo "test card 1\ntest card 2")
+
+    ./erudyka --directory test/ new "$card1"
+    ./erudyka --directory test/ new "$card2"
+    ./erudyka --directory test/ link 2 1
+    result=$(./erudyka --directory test/ get 1)
+
+    assert_equal "$expectedCard" "$result"
+    teardown
+
+##### CLEANUP ########
+
+rm -rf test
