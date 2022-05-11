@@ -163,40 +163,64 @@ void
 printUsageAndExit()
 {
     puts("erudyka <options> [command <args>]\n"
-         "        --dir <directory>           Specifies the erudyka root directory, by default: ~/.erudyka/\n"
+         "        --directory <dir>           Specifies the erudyka root directory, by default: ~/.erudyka/\n"
          "        [get <id>]                  Finds a card with specified id and prints it and all cards linked to it\n"
          "        [link <id1> <id2>]          Links two cards with specified ids together\n"
          "        [new <content>]             Adds a new card\n"
          "        [save <command> <content>]  Pipes <content> into sh <command> and uses result to create new card\n"
          "        [search <predicate>]        Prints all cards that match the predicate\n");
 
-    return 0;
+    exit(0);
 }
 
 int
 main(int argc, char const *argv[])
 {
-    erudykaMainDbPath = joinErudykaPath("main.edk");
-    erudykaLinksDbPath = joinErudykaPath("links.edk");
-
-    /* 1 parameter commands */
+    /* Options */
     if (argc < 3) printUsageAndExit();
 
-    if (!strcmp(argv[1], "get")) {           /* Retrieve a card by id */
-        return handleGet(atoi(argv[2]));
-    } else if (!strcmp(argv[1], "new")) {    /* Add a new card */
-        return handleNewCard(argv[2]);
-    } else if (!strcmp(argv[1], "search")) { /* Search for cards that match the parameter */
-        return handleSearch(argv[2]);
+    int i;
+    for (i = 1; i < argc; i++) {
+        if (strncmp("--", argv[i], 2)) break;
+
+        if (!strcmp(argv[i], "--directory")) { /* Specify the erudyka root directory */
+            i++;
+            asprintf(&erudykaMainDbPath, "%smain.edk", argv[i]);
+            asprintf(&erudykaLinksDbPath, "%slinks.edk", argv[i]);
+            continue;
+        }
+
+        printUsageAndExit();
+    }
+
+    if (erudykaMainDbPath == NULL)
+        erudykaMainDbPath = joinErudykaPath("main.edk");
+    if (erudykaLinksDbPath == NULL)
+        erudykaLinksDbPath = joinErudykaPath("links.edk");
+
+    /* 1 parameter commands */
+    if (argc < i + 1) printUsageAndExit();
+
+    const char *command = argv[i];
+    const char *parameter1 = argv[++i];
+
+    if (!strcmp(command, "get")) {            /* Retrieve a card by id */
+        return handleGet(atoi(parameter1));
+    } else if (!strcmp(command, "new")) {     /* Add a new card */
+        return handleNewCard(parameter1);
+    } else if (!strcmp(command, "search")) {  /* Search for cards that match the parameter */
+        return handleSearch(parameter1);
     }
 
     /* 2 parameter commands */
-    if (argc < 4) printUsageAndExit();
+    if (argc < ++i) printUsageAndExit();
 
-    if (!strcmp(argv[1], "link")) {          /* Link card1 to card2 */
-        return handleLink(atoi(argv[2]), atoi(argv[3]));
-    } else if (!strcmp(argv[1], "save")) {   /* Pass input to the specified script and save output as card */
-        return handleSave(argv[2], argv[3]);
+    const char *parameter2 = argv[i];
+
+    if (!strcmp(command, "link")) {           /* Link card1 to card2 */
+        return handleLink(atoi(parameter1), atoi(parameter2));
+    } else if (!strcmp(command, "save")) {    /* Pass input to the specified script and save output as card */
+        return handleSave(parameter1, parameter2);
     }
 
     printUsageAndExit();
