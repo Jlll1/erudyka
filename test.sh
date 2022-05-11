@@ -5,7 +5,7 @@ test() {
 
 assert_equal() {
     expected="$1"
-    actual="$?"
+    actual="$2"
 
     if [ "$actual" = "$expected" ]; then
         echo "* PASS\t$expected => $actual"
@@ -20,7 +20,14 @@ mkdir -p test/scripts
 
 ##### TESTS ########
 
+test "new <card> -> search <card> returns <card> with id 1"
+    card="test card"
+    expectedCard="1: test card"
 
+    ./erudyka --directory test/ new "$card"
+    result=$(./erudyka --directory test/ search "$card")
+
+    assert_equal "$expectedCard" "$result"
 
 
 ##### CLEANUP ######
