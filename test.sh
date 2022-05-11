@@ -65,6 +65,18 @@ test "get prints linked cards"
     assert_equal "$expectedCard" "$result"
     teardown
 
+test "search doesn't return unrelated results"
+    card1="test card 1"
+    card2="unrelated card"
+    expectedCard="1: test card 1"
+
+    ./erudyka --directory test/ new "$card1"
+    ./erudyka --directory test/ new "$card2"
+    result=$(./erudyka --directory test/ search "test")
+
+    assert_equal "$expectedCard" "$result"
+    teardown
+
 ##### CLEANUP ########
 
 rm -rf test
