@@ -70,9 +70,10 @@ handleGet(int id)
     if (id < 1) return -1;
 
     FILE *links = fopen(erudykaLinksDbPath, "r");
-    if (links == NULL) return -1;
 
     printCard(id);
+
+    if (links == NULL) return 0;
 
     char link[30];
     while (fgets(link, 30, links)) {
