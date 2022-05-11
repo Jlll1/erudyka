@@ -3,22 +3,35 @@ test() {
     echo "$1"
 }
 
+setup() {
+    mkdir -p test/scripts
+}
+
+teardown() {
+    rm -rf test
+    setup
+}
+
 assert_equal() {
     expected="$1"
     actual="$2"
 
     if [ "$actual" = "$expected" ]; then
-        echo "* PASS\t$expected => $actual"
+        echo "PASS"
     else
-        echo "# FAIL\tExpected $expected, but got $actual"
+        echo "FAIL - Expected '$expected', but got '$actual'"
     fi
+
+    echo ""
 }
 
 ##### SETUP ########
 
-mkdir -p test/scripts
+setup
 
 ##### TESTS ########
+
+echo ""
 
 test "new <card> -> search <card> returns <card> with id 1"
     card="test card"
@@ -28,8 +41,14 @@ test "new <card> -> search <card> returns <card> with id 1"
     result=$(./erudyka --directory test/ search "$card")
 
     assert_equal "$expectedCard" "$result"
+    teardown
 
+test "new <card> -> get 1 returns <card>"
+    card="test card"
+    expectedCard="test card"
 
-##### CLEANUP ######
+    ./erudyka --directory test/ new "$card"
+    result=$(./erudyka --directory test/ get 1)
 
-rm -rf test
+    assert_equal "$expectedCard" "$result"
+    teardown
