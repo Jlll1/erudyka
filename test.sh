@@ -59,11 +59,16 @@ test "new <card> -> get 1 returns <card>"
 test "get prints linked cards"
     card1="test card 1"
     card2="test card 2"
-    expectedCard=$(echo "test card 1\ntest card 2")
+    card3="test card 3"
+    card4="test card 4"
+    expectedCard=$(echo "test card 1\ntest card 2\ntest card 4")
 
     erudyka new "$card1"
     erudyka new "$card2"
+    erudyka new "$card3"
+    erudyka new "$card4"
     erudyka link 2 1
+    erudyka link 4 1
     result=$(erudyka get 1)
 
     assert_equal "$expectedCard" "$result"
@@ -94,6 +99,17 @@ test "search displays ids"
 
     assert_equal "$expectedCard" "$result"
     teardown
+
+test "search is case insensitive"
+    card1="TEST"
+    expectedCard="1: TEST"
+
+    erudyka new "$card1"
+    result=$(erudyka search "test")
+
+    assert_equal "$expectedCard" "$result"
+    teardown
+
 
 ##### CLEANUP ########
 
