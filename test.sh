@@ -12,6 +12,10 @@ teardown() {
     setup
 }
 
+erudyka() {
+    ./erudyka --directory test/ "$@"
+}
+
 assert_equal() {
     expected="$1"
     actual="$2"
@@ -19,7 +23,7 @@ assert_equal() {
     if [ "$actual" = "$expected" ]; then
         echo "PASS"
     else
-        echo "FAIL - Expected '$expcetd', but got '$actual'."
+        echo "FAIL - Expected '$expected', but got '$actual'."
     fi
 
     echo ""
@@ -36,7 +40,7 @@ test "new <card> -> search <card> returns <card> with id 1"
     card="test card"
     expectedCard="1: test card"
 
-    ./erudyka --directory test/ new "$card"
+    erudyka new "$card"
     result=$(./erudyka --directory test/ search "$card")
 
     assert_equal "$expectedCard" "$result"
@@ -72,6 +76,20 @@ test "search doesn't return unrelated results"
 
     ./erudyka --directory test/ new "$card1"
     ./erudyka --directory test/ new "$card2"
+    result=$(./erudyka --directory test/ search "test")
+
+    assert_equal "$expectedCard" "$result"
+    teardown
+
+test "search displays ids"
+    card1="test"
+    card2="abc"
+    expectedCard=$(echo "1: test\n\n3: test\n\n4: test")
+
+    ./erudyka --directory test/ new "$card1"
+    ./erudyka --directory test/ new "$card2"
+    ./erudyka --directory test/ new "$card1"
+    ./erudyka --directory test/ new "$card1"
     result=$(./erudyka --directory test/ search "test")
 
     assert_equal "$expectedCard" "$result"
