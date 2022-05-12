@@ -110,6 +110,18 @@ test "search is case insensitive"
     assert_equal "$expectedCard" "$result"
     teardown
 
+test "save"
+    echo '#!/bin/sh
+echo "abc $1"' > test/scripts/t.sh
+    card1="test"
+    expectedCard="abc test"
+
+    erudyka save "$card1" t
+    result=$(erudyka get 1)
+
+    assert_equal "$expectedCard" "$result"
+    teardown
+
 
 ##### CLEANUP ########
 
