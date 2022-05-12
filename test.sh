@@ -122,6 +122,29 @@ echo "abc $1"' > test/scripts/t.sh
     assert_equal "$expectedCard" "$result"
     teardown
 
+test "get trims whitespace"
+    card1="test\ntest  \t \n   \n  \n"
+    expectedCard=$(echo "test\ntest")
+
+    erudyka new "$card1"
+    result=$(erudyka get 1)
+
+    assert_equal "$expectedCard" "$result"
+    teardown
+
+test "search trims whitespace"
+    card1="test\ntest  \t \n   \n  \n"
+    card2="test\ntest2 \n  \n"
+    card3="test"
+    expectedCard=$(echo "1: test\ntest\n\n2: test\ntest2\n\n3: test")
+
+    erudyka new "$card1"
+    erudyka new "$card2"
+    erudyka new "$card3"
+    result=$(erudyka search test)
+
+    assert_equal "$expectedCard" "$result"
+    teardown
 
 ##### CLEANUP ########
 
