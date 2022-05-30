@@ -146,6 +146,25 @@ test "search trims whitespace"
     assert_equal "$expectedCard" "$result"
     teardown
 
+test "get returns full card with newlines"
+    card1=$(echo "test\ntest\ntest")
+
+    erudyka new "$card1"
+    result=$(erudyka get 1)
+
+    assert_equal "$card1" "$result"
+    teardown
+
+test "search returns full card with newlines"
+    card1=$(echo "test\ntest\ntest")
+    expectedCard="1: $card1"
+
+    erudyka new "$card1"
+    result=$(erudyka search test)
+
+    assert_equal "$expectedCard" "$result"
+    teardown
+
 ##### CLEANUP ########
 
 rm -rf test
